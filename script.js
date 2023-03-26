@@ -29,13 +29,23 @@ const operations = {
 let a = "";
 let b = "";
 let action = "";
+let completed = false;
 
 function enterNumber(target) {
+  if (completed) {
+    a = "";
+    b = "";
+    action = "";
+    screen.textContent = "0";
+  }
   if (b === "" && action === "") {
+    completed = false;
     target !== "." ? (a += target) : a.includes(".") ? null : (a += target);
+    a = a.length > 10 ? a.slice(0, -1) : a;
     screen.textContent = a;
   } else {
     target !== "." ? (b += target) : b.includes(".") ? null : (b += target);
+    b = b.length > 10 ? b.slice(0, -1) : b;
     screen.textContent = b;
   }
 }
@@ -43,10 +53,12 @@ function enterNumber(target) {
 function calculate(target) {
   a = target === "√" ? operations["√"](a) : operations[`${action}`](a, b);
   screen.textContent = a;
-  b = "";
+  completed = true;
 }
 
 function addAction(target) {
+  completed = false;
+  b = "";
   action = target;
   screen.textContent = action;
 }
@@ -105,4 +117,8 @@ buttons.addEventListener("click", (e) => {
 
       break;
   }
+  console.log("a:" + a);
+  console.log("b:" + b);
+  console.log("action:" + action);
+  console.log("-----------");
 });
