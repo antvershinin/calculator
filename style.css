@@ -1,73 +1,76 @@
 body {
-    display: flex;
-    justify-content: center;
-    
+  display: flex;
+  justify-content: center;
 }
 
 .calculator {
-    width: 500px;
-    border: solid 3px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: lightgray;
+  width: 500px;
+  border: solid 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: darkslategray;
 }
 
 .calculator__screen {
-    width: 400px;
-    height: 100px;
-    border: solid 3px;
-    margin-top: 25px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    font-family: Orbitron;
-    font-size: 40px;
-    background-color: lightblue;
+  width: 400px;
+  height: 100px;
+  border: solid 3px;
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-family: Orbitron;
+  font-size: 40px;
+  background-color: lightblue;
 }
 
 .calculator__buttons {
-    display: flex;
-    flex-direction: row;
-    width: 400px;
-    margin: 25px;
-    justify-content: space-between;
-    gap: 30px;
-    background-color: #fff;
+  display: flex;
+  flex-direction: row;
+  width: 400px;
+  margin: 25px;
+  justify-content: space-between;
+  gap: 30px;
 }
 
 .buttons__numbers {
-    width: 60%;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
 .buttons__operations {
-    width: 40%;
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-    gap: 25px;
- 
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 25px;
 }
 
 .button__row {
-    display: flex;
-    gap: 25px;
+  display: flex;
+  gap: 25px;
 }
-
 
 .button {
-    width: 50px;
-    height: 50px;
-    border-radius: 20%;
-    border: 1px;
-    background-color: black;
-    color: #fff;
+  width: 55px;
+  height: 55px;
+  border-radius: 20%;
+  border: 1px;
+  font-size: 30px;
 }
 
+.operation__button {
+  background-color: darkgray;
+  color: #fff;
+  font-style: italic;
+}
 
-
-
+.number__button {
+  background-color: lightgray;
+  color: black;
+  font-style: oblique;
+  font-weight: bold;
+}
