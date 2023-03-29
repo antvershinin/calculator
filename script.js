@@ -3,16 +3,17 @@
 const screenMain = document.querySelector(".screen__main");
 const screenExpression = document.querySelector(".screen__expression");
 const buttons = document.querySelector(".calculator__buttons");
-const numbersKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
-const actionsKeys = ["*", "/", "^", "+", "-", "√"];
+const operandKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
+const operatorKeys = ["*", "/", "^", "+", "-", "√"];
 
 let operands = [""];
-let newOperandIndex;
+let newOperandIndex; 
 let completed = false;
 let stackNumbers = [];
 let stackOperators = [];
 let currentOperator;
 
+// Priority of operators
 const priority = {
   "^": 3,
   "√": 3,
@@ -22,6 +23,7 @@ const priority = {
   "-": 1,
 };
 
+// Calculations of each operator
 const operations = {
   "*": (operand1, operand2) => operand1 * operand2,
   "/": (operand1, operand2) => operand2 / operand1,
@@ -31,37 +33,45 @@ const operations = {
   "^": (operand1, operand2) => Math.pow(operand2, operand1),
 };
 
+// Clearing stack of main function
 function clearStack() {
   stackNumbers = [];
   stackOperators = [];
 }
 
+// Starting from the beginnin 
 function clearAll() {
   operands = [""];
   screenExpression.textContent = 0;
   screenMain.textContent = 0;
 }
 
+// Main function
 function calculate(array) {
-  array = array.map((el) => (!actionsKeys.includes(el) ? +el : el));
+  // Transforming operands from string to number
+  array = array.map((el) => (!operatorKeys.includes(el) ? +el : el));
 
-  function makeCalc() {
+  // Calculating stack
+  function calculateStack() {
     stackNumbers.push(
       operations[stackOperators.pop()](stackNumbers.pop(), stackNumbers.pop())
     );
   }
 
-  function makeSqrt() {
+  // Calculating square root
+  function calculateStackSqrt() {
     stackNumbers.push(operations[stackOperators.pop()])(stackNumbers.pop());
   }
 
+  
   array.forEach((el) => {
+    // Pushing operands into the operands stack
     switch (typeof el) {
       case "number":
         stackNumbers.push(el);
 
         break;
-
+      // Pushing operators into the operators stack
       case "string":
         if (
           priority[el] > priority[stackOperators[stackOperators.length - 1]] ||
@@ -71,8 +81,9 @@ function calculate(array) {
         else if (
           priority[el] <= priority[stackOperators[stackOperators.length - 1]]
         ) {
+          // If priority of new operator is less or equal to the last in stack making calculations
           do {
-            el === '"√"' ? makeSqrt() : makeCalc();
+            el === '"√"' ? calculateStackSqrt() : calculateStack();
             currentOperator = stackOperators[stackOperators.length - 1];
           } while (priority[el] <= priority[currentOperator]);
           stackOperators.push(el);
@@ -80,24 +91,27 @@ function calculate(array) {
     }
   });
 
-  if (stackOperators.length === 2) makeCalc();
-  if (stackOperators.length === 1) makeCalc();
+  // Finishing calculations when one or two operators are left 
+  if (stackOperators.length === 2) calculateStack();
+  if (stackOperators.length === 1) calculateStack();
 
-  if (stackNumbers[0] % 2 !== 0 && toString(stackNumbers[0].length > 10))
-    stackNumbers[0] = stackNumbers[0].toFixed(8);
-
+  // Rounding the output
+  if (stackNumbers[0] %1 !== 0 && toString(stackNumbers[0].length > 10))
+    stackNumbers[0] = stackNumbers[0].toFixed(6);
+  
   screenMain.textContent = operands[0] = stackNumbers[0];
   completed = true;
   console.log(operands);
   clearStack();
 }
 
-function enterNumber(target) {
+function addOperand(target) {
   if (completed) {
     operands = [""];
     clearStack();
   }
-
+  
+  // Deleting of digits after the dot
   if (target === "<" && operands[newOperandIndex].includes(".")) {
     {
       operands[newOperandIndex] = operands[newOperandIndex].slice(0, -1);
@@ -108,8 +122,10 @@ function enterNumber(target) {
     }
   }
 
+  // Preventing from inputing more than one dot into the operand
   if (target === "." && operands[newOperandIndex].includes(".")) return;
 
+  // Adding next operands
   if (operands.length === 1 && target !== "<") {
     completed = false;
     newOperandIndex = 0;
@@ -121,11 +137,14 @@ function enterNumber(target) {
   screenMain.textContent = operands[newOperandIndex];
 }
 
-function addAction(target) {
+
+function addOperator(target) {
+  // If user decides to calculate the result of previous calculation
   if (completed) {
     operands.splice(1);
   }
 
+  
   completed = false;
   operands[operands.length] = target;
   newOperandIndex = operands.length;
@@ -138,12 +157,12 @@ function mouseClick(e) {
 
   switch (e.target.id) {
     case "number":
-      enterNumber(e.target.value);
+      addOperand(e.target.value);
 
       break;
 
     case "action":
-      addAction(e.target.value);
+      addOperator(e.target.value);
 
       break;
 
@@ -159,10 +178,10 @@ function mouseClick(e) {
 }
 
 function keyboardPress(e) {
-  if (numbersKeys.includes(e.key)) {
-    enterNumber(e.key);
-  } else if (actionsKeys.includes(e.key)) {
-    addAction(e.key);
+  if (operandKeys.includes(e.key)) {
+    addOperand(e.key);
+  } else if (operatorKeys.includes(e.key)) {
+    addOperator(e.key);
   } else if (e.key === "Enter" || e.key === "=") {
     calculate(operands);
   } else return;
