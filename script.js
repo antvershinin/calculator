@@ -29,10 +29,19 @@ const operations = {
   "-": (a, b) => b - a,
 };
 
+function clearStack() {
+  stackNumbers = [];
+  stackOperators = [];
+}
+
+function clearAll() {
+  operands = [""];
+  screenExpression.textContent = 0;
+  screenMain.textContent = 0;
+}
+
 function calculate(array) {
-  array = array.map((el) =>
-    !actionsKeys.includes(el) && el !== "" ? +el : el
-  );
+  array = array.map((el) => (!actionsKeys.includes(el) ? +el : el));
 
   function makeCalc() {
     stackNumbers.push(
@@ -68,9 +77,12 @@ function calculate(array) {
   if (stackOperators.length === 2) makeCalc();
   if (stackOperators.length === 1) makeCalc();
 
-  screenMain.textContent = result = stackNumbers[0];
+  screenMain.textContent = operands[0] = result = stackNumbers[0];
   completed = true;
-  operands = [""];
+
+  clearStack();
+
+  console.log(operands);
 }
 
 function enterNumber(target) {
@@ -103,11 +115,15 @@ function enterNumber(target) {
 }
 
 function addAction(target) {
+  if (completed) {
+    operands.splice(1);
+  }
+
   completed = false;
   operands[operands.length] = target;
   newOperandIndex = operands.length;
   operands.push("");
-  console.log(operands);
+  screenMain.textContent = target;
 }
 
 // buttons.addEventListener("keypress", (e) => {
@@ -143,6 +159,7 @@ buttons.addEventListener("click", (e) => {
       break;
 
     case "clear":
+      clearAll();
       break;
 
       // case "action--delete":
