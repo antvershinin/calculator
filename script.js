@@ -4,7 +4,7 @@ const screenMain = document.querySelector(".screen__main");
 const screenExpression = document.querySelector(".screen__expression");
 const buttons = document.querySelector(".calculator__buttons");
 const numbersKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
-const actionsKeys = ["*", "/", "^", "+", "-"];
+const actionsKeys = ["*", "/", "^", "+", "-", "√"];
 
 let operands = [""];
 let newOperandIndex;
@@ -14,6 +14,8 @@ let stackOperators = [];
 let currentOperator;
 
 const priority = {
+  "^": 3,
+  "√": 3,
   "*": 2,
   "/": 2,
   "+": 1,
@@ -21,10 +23,12 @@ const priority = {
 };
 
 const operations = {
-  "*": (a, b) => a * b,
-  "/": (a, b) => b / a,
-  "+": (a, b) => a + b,
-  "-": (a, b) => b - a,
+  "*": (operand1, operand2) => operand1 * operand2,
+  "/": (operand1, operand2) => operand2 / operand1,
+  "+": (operand1, operand2) => operand1 + operand2,
+  "-": (operand1, operand2) => operand2 - operand1,
+  "√": (operand1) => Math.sqrt(operand1),
+  "^": (operand1, operand2) => Math.pow(operand2, operand1),
 };
 
 function clearStack() {
@@ -47,6 +51,10 @@ function calculate(array) {
     );
   }
 
+  function makeSqrt() {
+    stackNumbers.push(operations[stackOperators.pop()])(stackNumbers.pop());
+  }
+
   array.forEach((el) => {
     switch (typeof el) {
       case "number":
@@ -64,7 +72,7 @@ function calculate(array) {
           priority[el] <= priority[stackOperators[stackOperators.length - 1]]
         ) {
           do {
-            makeCalc();
+            el === '"√"' ? makeSqrt() : makeCalc();
             currentOperator = stackOperators[stackOperators.length - 1];
           } while (priority[el] <= priority[currentOperator]);
           stackOperators.push(el);
@@ -75,9 +83,12 @@ function calculate(array) {
   if (stackOperators.length === 2) makeCalc();
   if (stackOperators.length === 1) makeCalc();
 
+  if (stackNumbers[0] % 2 !== 0 && toString(stackNumbers[0].length > 10))
+    stackNumbers[0] = stackNumbers[0].toFixed(8);
+
   screenMain.textContent = operands[0] = stackNumbers[0];
   completed = true;
-
+  console.log(operands);
   clearStack();
 }
 
@@ -87,18 +98,27 @@ function enterNumber(target) {
     clearStack();
   }
 
-  if (operands.length === 1) {
-    if (target === "." && operands[0].includes(".")) return;
+  if (target === "<" && operands[newOperandIndex].includes(".")) {
+    {
+      operands[newOperandIndex] = operands[newOperandIndex].slice(0, -1);
+      operands[newOperandIndex] = operands[newOperandIndex].endsWith(".")
+        ? operands[newOperandIndex].slice(0, -1)
+        : operands[newOperandIndex];
+      screenMain.textContent = operands[newOperandIndex];
+    }
+  }
+
+  if (target === "." && operands[newOperandIndex].includes(".")) return;
+
+  if (operands.length === 1 && target !== "<") {
     completed = false;
+    newOperandIndex = 0;
     operands[0] += target;
-    screenMain.textContent = operands[0];
-  } else {
-    if (target === "." && operands[newOperandIndex].includes(".")) return;
+  } else if (target !== "<") {
     operands[newOperandIndex] += target;
-    screenMain.textContent = operands[newOperandIndex];
   }
   screenExpression.textContent = operands.join(" ");
-  console.log(operands);
+  screenMain.textContent = operands[newOperandIndex];
 }
 
 function addAction(target) {
@@ -113,17 +133,7 @@ function addAction(target) {
   screenMain.textContent = target;
 }
 
-// buttons.addEventListener("keypress", (e) => {
-//   if (numbersKeyboard.includes(e.key)) {
-//     enterNumber(e.key);
-//   } else if (actionsKeyboard.includes(e.key)) {
-//     addAction(e.key);
-//   } else if (e.key === "=") {
-//     calculate(e.key);
-//   } else return;
-// });
-
-buttons.addEventListener("click", (e) => {
+function mouseClick(e) {
   if (!e.target.classList.contains("button")) return;
 
   switch (e.target.id) {
@@ -133,32 +143,37 @@ buttons.addEventListener("click", (e) => {
       break;
 
     case "action":
-      {
-        addAction(e.target.value);
-      }
+      addAction(e.target.value);
+
       break;
 
     case "equal":
-      {
-        calculate(operands);
-      }
+      calculate(operands);
 
       break;
 
     case "clear":
       clearAll();
       break;
-
-      // case "action--delete":
-      //   {
-      //     if (a.includes(".")) {
-      //       a = a.slice(0, -1);
-      //       a = a.endsWith(".") ? a.slice(0, -1) : a;
-      //       screen.textContent = a;
-      //     }
-      //     console.log(a);
-      //   }
-
-      break;
   }
+}
+
+function keyboardPress(e) {
+  if (numbersKeys.includes(e.key)) {
+    enterNumber(e.key);
+  } else if (actionsKeys.includes(e.key)) {
+    addAction(e.key);
+  } else if (e.key === "Enter" || e.key === "=") {
+    calculate(operands);
+  } else return;
+}
+
+buttons.addEventListener("click", (e) => {
+  mouseClick(e);
+  e.preventDefault();
+});
+
+buttons.addEventListener("keypress", (e) => {
+  e.preventDefault();
+  keyboardPress(e);
 });

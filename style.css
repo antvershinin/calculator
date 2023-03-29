@@ -74,6 +74,7 @@ body {
   border-radius: 20%;
   border: 1px;
   font-size: 30px;
+  outline: none;
 }
 
 .operation__button {
