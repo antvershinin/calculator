@@ -8,9 +8,7 @@ const actionsKeys = ["*", "/", "^", "+", "-"];
 
 let operands = [""];
 let newOperandIndex;
-let currentOperand;
 let completed = false;
-let result = "";
 let stackNumbers = [];
 let stackOperators = [];
 let currentOperator;
@@ -77,38 +75,27 @@ function calculate(array) {
   if (stackOperators.length === 2) makeCalc();
   if (stackOperators.length === 1) makeCalc();
 
-  screenMain.textContent = operands[0] = result = stackNumbers[0];
+  screenMain.textContent = operands[0] = stackNumbers[0];
   completed = true;
 
   clearStack();
-
-  console.log(operands);
 }
 
 function enterNumber(target) {
   if (completed) {
     operands = [""];
-    stackNumbers = [];
-    screenMain.textContent = "0";
-    screenExpression.textContent = "0";
+    clearStack();
   }
+
   if (operands.length === 1) {
+    if (target === "." && operands[0].includes(".")) return;
     completed = false;
-    target !== "."
-      ? (operands[0] += target)
-      : operands[0].includes(".")
-      ? null
-      : (operands[0] += target);
-    // a = a.length > 10 ? a.slice(0, -1) : a;
+    operands[0] += target;
     screenMain.textContent = operands[0];
   } else {
-    target !== "."
-      ? (operands[newOperandIndex] += target)
-      : operands[operands.length].includes(".")
-      ? null
-      : (operands[newOperandIndex] += target);
+    if (target === "." && operands[newOperandIndex].includes(".")) return;
+    operands[newOperandIndex] += target;
     screenMain.textContent = operands[newOperandIndex];
-    // b = b.length > 10 ? b.slice(0, -1) : b;
   }
   screenExpression.textContent = operands.join(" ");
   console.log(operands);
